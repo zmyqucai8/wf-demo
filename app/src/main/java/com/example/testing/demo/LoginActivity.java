@@ -42,6 +42,7 @@ public class LoginActivity extends Activity {
     RadioButton radio2;
     RadioGroup group;
     TextView tv_restut;
+    //test submit
     boolean select = false;//默认ture 多选
 
     @Override
