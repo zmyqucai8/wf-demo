@@ -5,6 +5,7 @@ import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -31,7 +32,6 @@ public class SelectPersonAdapter extends BaseQuickAdapter<String, BaseViewHolder
     private OnItemCheckLitener mOnItemCheckLitener;
     //true= 单选， false =多选
     private boolean choiceModel = false;
-
     //设置选择模式 true= 单选， false =多选
     public void setChoiceModel(boolean model) {
         this.choiceModel = model;
@@ -72,8 +72,7 @@ public class SelectPersonAdapter extends BaseQuickAdapter<String, BaseViewHolder
         } else {
             name = item;
         }
-        helper.setVisible(R.id.title, true)
-                .setText(R.id.title, name.substring(0, 1));//设置默认显示首字，防止出现快速滑动产生的问题
+        helper.setText(R.id.title, name.substring(0, 1));//设置默认显示首字，防止出现快速滑动产生的问题
         helper.setText(R.id.name, name);
         String url = "http://192.168.0.12:8900/hrinfophoto/l/" + name + ".jpg";
         Glide.with(App.getContext())
@@ -87,8 +86,7 @@ public class SelectPersonAdapter extends BaseQuickAdapter<String, BaseViewHolder
                         super.onLoadFailed(e, errorDrawable);
                         //图片加载失败
                         helper.setVisible(R.id.img, false)
-                                .setVisible(R.id.title, true)
-                                .setText(R.id.title, name.substring(0, 1));
+                                .setVisible(R.id.title, true);
                     }
 
                     @Override
@@ -97,21 +95,41 @@ public class SelectPersonAdapter extends BaseQuickAdapter<String, BaseViewHolder
                         //图片加载成功
                         helper.setVisible(R.id.img, true)
                                 .setVisible(R.id.title, false)
-                                .setText(R.id.title, name.substring(0, 1));
+                        ;
                     }
                 });
 
-        //设置checkbox
+        RadioButton radioButton = helper.getView(R.id.radio);
         CheckBox checkBox = helper.getView(R.id.check);
-        //状态
-        checkBox.setChecked(isItemChecked(helper.getAdapterPosition()));
-        //点击
-        checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setCheck(helper, v);
-            }
-        });
+        //设置显示checkbox 还是radio
+        if (choiceModel) {
+            //单选设置radio
+            radioButton.setVisibility(View.VISIBLE);
+//            checkBox.setVisibility(View.GONE);
+            //状态
+            radioButton.setChecked(isItemChecked(helper.getAdapterPosition()));
+            //点击
+            radioButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setCheck(helper, v);
+                }
+            });
+
+        } else {
+            //多选
+//            radioButton.setVisibility(View.GONE);
+            checkBox.setVisibility(View.VISIBLE);
+            checkBox.setChecked(isItemChecked(helper.getAdapterPosition()));
+            //点击
+            checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setCheck(helper, v);
+                }
+            });
+        }
+
         //item的点击
         helper.getConvertView().setOnClickListener(new View.OnClickListener() {
             @Override

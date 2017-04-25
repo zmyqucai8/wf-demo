@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.example.testing.demo.ChildListBean;
 import com.example.testing.demo.GroupListBean;
-import com.example.testing.demo.treeview.Element;
+import com.example.testing.demo.select.treeview.Element;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
@@ -233,16 +233,16 @@ public class XmlUtlis {
             Log.e("TAG", b.toString());
         }
         Log.e("*********", "****************************************");
-        //对最终数据 进行排序 , 有子类的放前面
-//        elementsData = px(elementsData);
+        //对最终数据 进行排序
+//        elementsData = sort(elementsData);
         for (Element b : elementsData) {
             Log.e("所有数据", b.toString());
         }
         return elementsData;
     }
 
-    //对数据进行排序
-    public static ArrayList<Element> px(ArrayList<Element> elements) {
+    //对数据进行排序 , 有子类的放前面
+    public static ArrayList<Element> sort(ArrayList<Element> elements) {
         Collections.sort(elements, new Comparator<Element>() {
             @Override
             public int compare(Element lhs, Element rhs) {

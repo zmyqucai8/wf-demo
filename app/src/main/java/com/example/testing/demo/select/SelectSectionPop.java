@@ -14,8 +14,8 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 
 import com.example.testing.demo.R;
-import com.example.testing.demo.treeview.Element;
-import com.example.testing.demo.treeview.TreeViewAdapter;
+import com.example.testing.demo.select.treeview.Element;
+import com.example.testing.demo.select.treeview.TreeViewAdapter;
 import com.example.testing.demo.upload.AmUtlis;
 
 import java.util.ArrayList;
@@ -91,7 +91,9 @@ public class SelectSectionPop {
         final TreeViewAdapter treeViewAdapter = new TreeViewAdapter(mElements, mElementsData, inflater);
 //        TreeViewItemClickListener treeViewItemClickListener = new TreeViewItemClickListener(treeViewAdapter);
         treeview.setAdapter(treeViewAdapter);
-        treeViewAdapter.setExpanded(0);
+        if (treeViewAdapter.getCount() > 0) {
+            treeViewAdapter.setExpanded(0);
+        }
         treeview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

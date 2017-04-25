@@ -21,16 +21,16 @@ import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.example.testing.demo.R;
-import com.example.testing.demo.http.HttpCallBack;
-import com.example.testing.demo.http.OkHttpUtils;
-import com.example.testing.demo.treeview.Element;
+import com.example.testing.demo.select.treeview.Element;
 import com.example.testing.demo.upload.AmUtlis;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
+import okhttp3.Response;
 
 /**
  * Created by win7 on 2017/4/20.
@@ -54,7 +54,7 @@ public class SelectActivity extends Activity implements View.OnClickListener {
     int index = 0;//类型选择的index
     private ProgressDialog dialog;//类型选择的dialog
     private String sectionAllName;//当前部门的全称
-    private List<String> listData;//列表数据data
+    private List<String> listData = new ArrayList<>();//列表数据data
     //已选中数据
     private ArrayList<String> checkDataList = new ArrayList<>();
     private SelectDataShowPop selectDataShowPop; //已选中的数据pop
@@ -224,24 +224,23 @@ public class SelectActivity extends Activity implements View.OnClickListener {
             String s = tv_section.getText().toString();
             name = s.contains("\\") ? s.substring(0, s.indexOf("\\")) : s;
             String url = "http://192.168.0.12:8900/oanames.nsf/getSelectorTreeList?Openagent&getType=Search&Company=" + name + "&CategoryKey=按部门&NodeValue=" + name + "&AddressFrom=0&SearchName=" + str;
-            OkHttpUtils.get(url, new HttpCallBack() {
+
+            OkGo.get(url).tag(this).execute(new StringCallback() {
                 @Override
-                public void onSucceed(Call call, final String s) throws IOException {
-//柳眉|是|/hrinfophoto/柳眉.jpg|,刘主龙|是||,刘红宇|是||,刘夏德|是||,刘丽慧|是||,刘斌|是||,刘世武|是||,刘小五|是||,刘小三|是||,刘4无|是||,刘建华|是||
+                public void onSuccess(String s, Call call, Response response) {
+                    //柳眉|是|/hrinfophoto/柳眉.jpg|,刘主龙|是||,刘红宇|是||,刘夏德|是||,刘丽慧|是||,刘斌|是||,刘世武|是||,刘小五|是||,刘小三|是||,刘4无|是||,刘建华|是||
                     mAdapter.clearSelectedState();
+
                     listData.clear();
                     listData.addAll(AmUtlis.splitStringByChar(",", s));
                     mAdapter.setNewData(listData);
                 }
-
-                @Override
-                public void onError(Call call, IOException e) {
-                }
             });
+
         }
     }
-    //显示选择类型的dialog
 
+    //显示选择类型的dialog
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     private void showSelectTypeDialog() {
         if (isShowSelectTypeDialog) {
@@ -256,6 +255,9 @@ public class SelectActivity extends Activity implements View.OnClickListener {
                             btn_type.setText(s);
                             isShowSelectTypeDialog = true;
                             dialog.dismiss();
+                            if (TextUtils.isEmpty(sectionAllName)) {
+                                return;
+                            }
                             if ("按部门".equals(s)) {
                                 tv_section.setText(sectionAllName);
                                 if (sectionAllName.contains("\\")) {//切换到部门选择的时候如果不包含子部门，默认当前公司下的第一个子部门
@@ -301,9 +303,10 @@ public class SelectActivity extends Activity implements View.OnClickListener {
     private void initData() {
         dialog = ProgressDialog.show(this, "", "加载中...");
         String url = "http://192.168.0.12:8900/weboa/common/winfreeinfo.nsf/getdeptxml";
-        OkHttpUtils.get(url, new HttpCallBack() {
+
+        OkGo.get(url).tag(this).execute(new StringCallback() {
             @Override
-            public void onSucceed(Call call, final String s) throws IOException {
+            public void onSuccess(final String s, Call call, Response response) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -331,11 +334,8 @@ public class SelectActivity extends Activity implements View.OnClickListener {
                 }).start();
 
             }
-
-            @Override
-            public void onError(Call call, IOException e) {
-            }
         });
+
     }
 
     /**
@@ -351,19 +351,16 @@ public class SelectActivity extends Activity implements View.OnClickListener {
         String newNodeValue = nodeValue.replace("\\", "/");
         AmUtlis.showLog(newNodeValue);
         String url = "http://192.168.0.12:8900/oanames.nsf/getSelectorTreeList?Openagent&getType=Item&Company=" + company + "&CategoryKey=" + categoryKey + "&NodeValue=" + newNodeValue + "&AddressFrom=0";
-        OkHttpUtils.get(url, new HttpCallBack() {
-            @Override
-            public void onSucceed(Call call, final String s) throws IOException {
-//                admin||/hrinfophoto/admin.jpg|男,admin的部门第一负责人|是||,人事总监|是||,RachelLee|是||
-                listData = AmUtlis.splitStringByChar(",", s);
-                mAdapter.setNewData(listData);
-            }
 
-            @Override
-            public void onError(Call call, IOException e) {
-            }
-        });
-
+        OkGo.get(url).tag(this)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+//                        admin||/hrinfophoto/admin.jpg|男,admin的部门第一负责人|是||,人事总监|是||,RachelLee|是||
+                        listData = AmUtlis.splitStringByChar(",", s);
+                        mAdapter.setNewData(listData);
+                    }
+                });
     }
 
 
@@ -376,19 +373,20 @@ public class SelectActivity extends Activity implements View.OnClickListener {
         name = s.contains("\\") ? s.substring(0, s.indexOf("\\")) : s;
 
         String url = "http://192.168.0.12:8900/oanames.nsf/getSelectorTreeList?Openagent&getType=Tree&Company=" + name + "&CategoryKey=选群组";
-        OkHttpUtils.get(url, new HttpCallBack() {
-            @Override
-            public void onSucceed(Call call, final String s) throws IOException {
-//             //伟峰集团;test,123,rrrr,集团仓库管理群,测试群组,基金小组,群组12345,允许外发邮件的群1,允许外发邮件的群2,允许外发邮件总群,其他可编辑测试群组,公共资料修改人员,研发部普通技术人员,设计六所（华南区）,技术部组长,考勤-小组1,abc123,abc222,abc333,人力资源总监3,人力资源助理3,伟峰集团全体人员,伟峰集团-财务部,伟峰集团-采购部,伟峰集团-代理商管理部,伟峰集团-服装总部,伟峰集团-服装总部-服装部,伟峰集团-工程总部,伟峰集团-工程总部-工程上海分部,伟峰集团-工程总部-工程深圳分部,伟峰集团-技术测试部,伟峰集团-技术测试部-OA系统开发与维护部,伟峰集团-市场开发部,伟峰集团-物流部,伟峰集团-系统维护,伟峰集团-项目部,伟峰集团-综合部,伟峰集团-综合部-ISO办,伟峰集团-综合部-人事部,伟峰集团-综合部-行政部,伟峰集团-综合部-行政部-财务综合部,伟峰集团-综合部-行政部-财务综合部-品牌策划部,伟峰集团-综合管理部,伟峰集团-总经办,伟峰集团-总经办-ISO办,伟峰集团-总经办-导入部门,伟峰集团-总经办-技术部,伟峰集团-总经办-人力资源部,伟峰集团-总经办-销售部,伟峰集团-测试括号部门（test）,伟峰集团-test123abc,伟峰集团-总经办-人力资源部1,伟峰集团-综合管理部2
-                tv_section.setText(name);
-                String data = s.substring(s.indexOf(";") + 1, s.length());
-                listData = AmUtlis.splitStringByChar(",", data.replace(name + "-", ""));
-                mAdapter.setNewData(listData);
-            }
 
-            @Override
-            public void onError(Call call, IOException e) {
-            }
-        });
+        OkGo.get(url)
+                .tag(this)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        //伟峰集团;test,123,rrrr,集团仓库管理群,测试群组,基金小组,群组12345,允许外发邮件的群1,允许外发邮件的群2,允许外发邮件总群,其他可编辑测试群组,公共资料修改人员,研发部普通技术人员,设计六所（华南区）,技术部组长,考勤-小组1,abc123,abc222,abc333,人力资源总监3,人力资源助理3,伟峰集团全体人员,伟峰集团-财务部,伟峰集团-采购部,伟峰集团-代理商管理部,伟峰集团-服装总部,伟峰集团-服装总部-服装部,伟峰集团-工程总部,伟峰集团-工程总部-工程上海分部,伟峰集团-工程总部-工程深圳分部,伟峰集团-技术测试部,伟峰集团-技术测试部-OA系统开发与维护部,伟峰集团-市场开发部,伟峰集团-物流部,伟峰集团-系统维护,伟峰集团-项目部,伟峰集团-综合部,伟峰集团-综合部-ISO办,伟峰集团-综合部-人事部,伟峰集团-综合部-行政部,伟峰集团-综合部-行政部-财务综合部,伟峰集团-综合部-行政部-财务综合部-品牌策划部,伟峰集团-综合管理部,伟峰集团-总经办,伟峰集团-总经办-ISO办,伟峰集团-总经办-导入部门,伟峰集团-总经办-技术部,伟峰集团-总经办-人力资源部,伟峰集团-总经办-销售部,伟峰集团-测试括号部门（test）,伟峰集团-test123abc,伟峰集团-总经办-人力资源部1,伟峰集团-综合管理部2
+                        tv_section.setText(name);
+                        String data = s.substring(s.indexOf(";") + 1, s.length());
+                        listData = AmUtlis.splitStringByChar(",", data.replace(name + "-", ""));
+                        mAdapter.setNewData(listData);
+                    }
+                });
+
+
     }
 }

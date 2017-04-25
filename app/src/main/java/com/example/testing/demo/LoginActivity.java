@@ -14,22 +14,19 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.testing.demo.http.OkHttpUtils;
-import com.example.testing.demo.http.UploadActivity;
+import com.example.testing.demo.upload.UploadActivity;
 import com.example.testing.demo.select.SelectActivity;
 import com.example.testing.demo.upload.AmUtlis;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 
 import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -107,57 +104,30 @@ public class LoginActivity extends Activity {
      * //0=登录 1=上传测试 2=选择列表
      */
     private void loginHttp(final int type) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                String url = "http://192.168.0.12:8900/names.nsf?Login";
-                RequestBody formBody = new FormBody.Builder()
-                        .add("UserName", ed_name.getText().toString().trim())
-                        .add("Password", ed_pwd.getText().toString().trim())
-                        .build();
-                Request request = new Request.Builder()
-                        .url(url)
-                        .post(formBody)
-                        .build();
-                Call call = OkHttpUtils.getInstance().newCall(request);
-                call.enqueue(new Callback() {
+        String url = "http://192.168.0.12:8900/names.nsf?Login";
+        OkGo.post(url)
+                .tag(this)
+                .params("UserName", ed_name.getText().toString().trim())
+                .params("Password", ed_pwd.getText().toString().trim())
+                .execute(new StringCallback() {
                     @Override
-                    public void onFailure(Call call, IOException e) {
-
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-//                                Toast.makeText(getApplicationContext(), "登录成功", Toast.LENGTH_SHORT).show();
-                                if (type == 0) {
-                                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                                    if (imm != null) {
-                                        imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
-                                    }
-                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                                } else if (type == 1) {
-                                    startActivity(new Intent(LoginActivity.this, UploadActivity.class));
-                                } else if (type == 2) {
-                                    Intent intent = new Intent(LoginActivity.this, SelectActivity.class);
-                                    intent.putExtra("TAG", select);
-                                    startActivityForResult(intent, 1);
-                                }
+                    public void onSuccess(String s, Call call, Response response) {
+                        Toast.makeText(getApplicationContext(), "登录成功", Toast.LENGTH_SHORT).show();
+                        if (type == 0) {
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            if (imm != null) {
+                                imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
                             }
-                        });
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        } else if (type == 1) {
+                            startActivity(new Intent(LoginActivity.this, UploadActivity.class));
+                        } else if (type == 2) {
+                            Intent intent = new Intent(LoginActivity.this, SelectActivity.class);
+                            intent.putExtra("TAG", select);
+                            startActivityForResult(intent, 1);
+                        }
                     }
-
                 });
-
-
-            }
-        }).start();
-
-
     }
 
 

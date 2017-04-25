@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.example.testing.demo.http.HttpCallBack;
 import com.example.testing.demo.http.OkHttpUtils;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -65,18 +67,21 @@ public class DetailsActivity extends Activity {
      */
     private void okHttpGetXML() {
         String url = "http://192.168.0.12:8900/weboa/common/winfreeinfo.nsf/getpersonxml";
-        OkHttpUtils.get(url, new HttpCallBack() {
-            @Override
-            public void onSucceed(Call call,final  String s) throws IOException {
-                List<DetailsBean> xmlList = getXmlList(s);
-                setData(xmlList);
-            }
+        OkGo.get(url)
+                .tag(this)
+                .execute(new StringCallback() {
+                    @Override
+                    public void onSuccess(String s, Call call, Response response) {
+                        List<DetailsBean> xmlList = getXmlList(s);
+                        setData(xmlList);
+                    }
 
-            @Override
-            public void onError(Call call, IOException e) {
+                    @Override
+                    public void onError(Call call, Response response, Exception e) {
+                        super.onError(call, response, e);
 
-            }
-        });
+                    }
+                });
 
     }
 

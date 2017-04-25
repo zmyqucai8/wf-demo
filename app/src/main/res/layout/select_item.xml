@@ -31,8 +31,7 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/shape_rund_bg"
                 android:gravity="center"
-                android:textSize="25sp"
-                android:visibility="gone" />
+                android:textSize="25sp" />
         </RelativeLayout>
 
         <TextView
@@ -51,7 +50,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:visibility="gone" />
+
+        <RadioButton
+            android:id="@+id/radio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone" />
 
     </RelativeLayout>
 
