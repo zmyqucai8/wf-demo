@@ -16,6 +16,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.example.testing.demo.App;
 import com.example.testing.demo.CircleTransform;
 import com.example.testing.demo.R;
+import com.example.testing.demo.upload.AmUtlis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ public class SelectPersonAdapter extends BaseQuickAdapter<String, BaseViewHolder
     private OnItemCheckLitener mOnItemCheckLitener;
     //true= 单选， false =多选
     private boolean choiceModel = false;
+
     //设置选择模式 true= 单选， false =多选
     public void setChoiceModel(boolean model) {
         this.choiceModel = model;
@@ -67,14 +69,10 @@ public class SelectPersonAdapter extends BaseQuickAdapter<String, BaseViewHolder
     @Override
     protected void convert(final BaseViewHolder helper, final String item) {
         final String name;
-        if (item.contains("|")) {//如果包含|则取|前面的名字
-            name = item.substring(0, item.indexOf("|"));
-        } else {
-            name = item;
-        }
+        name= AmUtlis.containsStr("|",item);
         helper.setText(R.id.title, name.substring(0, 1));//设置默认显示首字，防止出现快速滑动产生的问题
         helper.setText(R.id.name, name);
-        String url = "http://192.168.0.12:8900/hrinfophoto/l/" + name + ".jpg";
+        String url = Constant.HOST + Constant.Photo + name + ".jpg";
         Glide.with(App.getContext())
                 .load(url)
                 .centerCrop()

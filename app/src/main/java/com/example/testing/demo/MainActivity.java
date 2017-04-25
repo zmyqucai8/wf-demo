@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         listview = (ExpandableListView) findViewById(R.id.expandableListView);
         dialog = ProgressDialog.show(this, "", "加载中...");
-        //子线程中去访问网络 以及操作数据
+        //子线程中去访问网络 以及操作数据 public static void main String
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -76,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser xmlPullParser = factory.newPullParser();
             xmlPullParser.setInput(new StringReader(xmlString));
-
             int eventType = xmlPullParser.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 switch (eventType) {

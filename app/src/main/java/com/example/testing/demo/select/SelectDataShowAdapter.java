@@ -13,6 +13,7 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.example.testing.demo.App;
 import com.example.testing.demo.CircleTransform;
 import com.example.testing.demo.R;
+import com.example.testing.demo.upload.AmUtlis;
 
 import java.util.List;
 
@@ -35,13 +36,9 @@ public class SelectDataShowAdapter extends BaseQuickAdapter<String, BaseViewHold
     @Override
     protected void convert(final BaseViewHolder helper, final String item) {
         final String name;
-        if (item.contains("|")) {
-            name = item.substring(0, item.indexOf("|"));
-        } else {
-            name = item;
-        }
+        name= AmUtlis.containsStr("|",item);
         helper.setText(R.id.name, name);
-        String url = "http://192.168.0.12:8900/hrinfophoto/l/" + name + ".jpg";
+        String url = Constant.HOST + Constant.Photo + name + ".jpg";
         Glide.with(App.getContext())
                 .load(url)
                 .centerCrop()

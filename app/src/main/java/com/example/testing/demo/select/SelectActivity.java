@@ -73,7 +73,7 @@ public class SelectActivity extends Activity implements View.OnClickListener {
     //设置已选中的信息
     public void setSelectInfo() {
         if (checkDataList.size() > 0) {
-            btn_select.setText("已选" + checkDataList.size() + "个，点击修改");
+            btn_select.setText("已选" + checkDataList.size() + "个,点击修改");
         } else {
             btn_select.setText("已选" + checkDataList.size() + "个");
         }
@@ -223,19 +223,26 @@ public class SelectActivity extends Activity implements View.OnClickListener {
             final String name; //公司名
             String s = tv_section.getText().toString();
             name = s.contains("\\") ? s.substring(0, s.indexOf("\\")) : s;
-            String url = "http://192.168.0.12:8900/oanames.nsf/getSelectorTreeList?Openagent&getType=Search&Company=" + name + "&CategoryKey=按部门&NodeValue=" + name + "&AddressFrom=0&SearchName=" + str;
+//            String url = "http://192.168.0.12:8900/oanames.nsf/getSelectorTreeList?Openagent&getType=Search&Company=" + name + "&CategoryKey=按部门&NodeValue=" + name + "&AddressFrom=0&SearchName=" + str;
+            OkGo.get(Constant.HOST + Constant.getSelectorTreeList).tag(this)
+                    .params("Openagent", "")
+                    .params("getType", "Search")
+                    .params("Company", name)
+                    .params("SearchName", str)
+                    .params("NodeValue", name)
+                    .params("CategoryKey", "按部门")
+                    .params("AddressFrom", 0)
+                    .execute(new StringCallback() {
+                        @Override
+                        public void onSuccess(String s, Call call, Response response) {
+                            //柳眉|是|/hrinfophoto/柳眉.jpg|,刘主龙|是||,刘红宇|是||,刘夏德|是||,刘丽慧|是||,刘斌|是||,刘世武|是||,刘小五|是||,刘小三|是||,刘4无|是||,刘建华|是||
+                            mAdapter.clearSelectedState();
 
-            OkGo.get(url).tag(this).execute(new StringCallback() {
-                @Override
-                public void onSuccess(String s, Call call, Response response) {
-                    //柳眉|是|/hrinfophoto/柳眉.jpg|,刘主龙|是||,刘红宇|是||,刘夏德|是||,刘丽慧|是||,刘斌|是||,刘世武|是||,刘小五|是||,刘小三|是||,刘4无|是||,刘建华|是||
-                    mAdapter.clearSelectedState();
-
-                    listData.clear();
-                    listData.addAll(AmUtlis.splitStringByChar(",", s));
-                    mAdapter.setNewData(listData);
-                }
-            });
+                            listData.clear();
+                            listData.addAll(AmUtlis.splitStringByChar(",", s));
+                            mAdapter.setNewData(listData);
+                        }
+                    });
 
         }
     }
@@ -302,9 +309,8 @@ public class SelectActivity extends Activity implements View.OnClickListener {
      */
     private void initData() {
         dialog = ProgressDialog.show(this, "", "加载中...");
-        String url = "http://192.168.0.12:8900/weboa/common/winfreeinfo.nsf/getdeptxml";
 
-        OkGo.get(url).tag(this).execute(new StringCallback() {
+        OkGo.get(Constant.HOST + Constant.getdeptxml).tag(this).execute(new StringCallback() {
             @Override
             public void onSuccess(final String s, Call call, Response response) {
                 new Thread(new Runnable() {
@@ -317,7 +323,7 @@ public class SelectActivity extends Activity implements View.OnClickListener {
                             @Override
                             public void run() {
                                 //设置默认第一个公司第一个部门
-                                dialog.dismiss();
+
                                 if (elementsData != null && elementsData.size() > 0) {
                                     String allName = elements.get(0).getContentText() + "\\" + elementsData.get(1).getContentText();
                                     tv_section.setText(allName);
@@ -350,15 +356,31 @@ public class SelectActivity extends Activity implements View.OnClickListener {
     private void httpGetPersonBySection(String company, String categoryKey, String nodeValue) {
         String newNodeValue = nodeValue.replace("\\", "/");
         AmUtlis.showLog(newNodeValue);
-        String url = "http://192.168.0.12:8900/oanames.nsf/getSelectorTreeList?Openagent&getType=Item&Company=" + company + "&CategoryKey=" + categoryKey + "&NodeValue=" + newNodeValue + "&AddressFrom=0";
-
-        OkGo.get(url).tag(this)
+//        String url = "http://192.168.0.12:8900/oanames.nsf/getSelectorTreeList?Openagent&getType=Item&Company=" + company + "&CategoryKey=" + categoryKey + "&NodeValue=" + newNodeValue + "&AddressFrom=0";
+        OkGo.get(Constant.HOST + Constant.getSelectorTreeList).tag(this)
+                .params("Openagent", "")
+                .params("getType", "Item")
+                .params("Company", company)
+                .params("CategoryKey", categoryKey)
+                .params("NodeValue", newNodeValue)
+                .params("AddressFrom", 0)
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(String s, Call call, Response response) {
 //                        admin||/hrinfophoto/admin.jpg|男,admin的部门第一负责人|是||,人事总监|是||,RachelLee|是||
                         listData = AmUtlis.splitStringByChar(",", s);
                         mAdapter.setNewData(listData);
+                        if (dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Call call, Response response, Exception e) {
+                        super.onError(call, response, e);
+                        if (dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
                     }
                 });
     }
@@ -371,11 +393,12 @@ public class SelectActivity extends Activity implements View.OnClickListener {
         final String name; //公司名
         String s = tv_section.getText().toString();
         name = s.contains("\\") ? s.substring(0, s.indexOf("\\")) : s;
-
-        String url = "http://192.168.0.12:8900/oanames.nsf/getSelectorTreeList?Openagent&getType=Tree&Company=" + name + "&CategoryKey=选群组";
-
-        OkGo.get(url)
+        OkGo.get(Constant.HOST + Constant.getSelectorTreeList)
                 .tag(this)
+                .params("Openagent", "")
+                .params("getType", "Item")
+                .params("Company", name)
+                .params("CategoryKey", "选群组")
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(String s, Call call, Response response) {
@@ -383,10 +406,15 @@ public class SelectActivity extends Activity implements View.OnClickListener {
                         tv_section.setText(name);
                         String data = s.substring(s.indexOf(";") + 1, s.length());
                         listData = AmUtlis.splitStringByChar(",", data.replace(name + "-", ""));
+                        //处理最后一条数据有换行符\n的问题
+                        String s1 = listData.get(listData.size() - 1);
+                        if (s1.contains("\n")) {
+                            listData.remove(listData.size() - 1);
+                            listData.add(s1.replace("\n", ""));
+                        }
+                        //设置新数据
                         mAdapter.setNewData(listData);
                     }
                 });
-
-
     }
 }

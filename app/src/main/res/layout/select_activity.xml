@@ -84,7 +84,6 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
-
             android:layout_width="match_parent"
             android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
     </LinearLayout>
@@ -95,26 +94,39 @@
         android:id="@+id/rl_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="3dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp">
 
         <Button
             android:id="@+id/btn_select"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="已选0个" />
+            android:layout_height="38dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/shape_red_selector"
+            android:text="已选0个"
+            android:textColor="@color/white" />
 
 
         <Button
             android:id="@+id/btn_yes"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="38dp"
             android:layout_alignParentRight="true"
-            android:text="确定" />
+            android:layout_centerVertical="true"
+            android:background="@drawable/shape_blue_selector"
+            android:text="确定"
+
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/btn_no"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
             android:layout_toLeftOf="@+id/btn_yes"
             android:text="取消" />
     </RelativeLayout>

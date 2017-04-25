@@ -229,15 +229,15 @@ public class XmlUtlis {
             }
             elementsData.add(e1);
         }
-        for (Element b : elements) {
-            Log.e("TAG", b.toString());
-        }
+//        for (Element b : elements) {
+//            Log.e("TAG", b.toString());
+//        }
         Log.e("*********", "****************************************");
         //对最终数据 进行排序
 //        elementsData = sort(elementsData);
-        for (Element b : elementsData) {
-            Log.e("所有数据", b.toString());
-        }
+//        for (Element b : elementsData) {
+//            Log.e("所有数据", b.toString());
+//        }
         return elementsData;
     }
 
